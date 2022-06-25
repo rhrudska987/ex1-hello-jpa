@@ -22,6 +22,10 @@ public class Member {
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
+
     /*private Integer age;
 
     @Enumerated(EnumType.STRING) //db에는 enum타입이 없기 때문에 enumerated를 사용해야 함, 그리고 STRING 필수
