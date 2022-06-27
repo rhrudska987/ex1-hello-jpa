@@ -4,7 +4,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.util.List;
 
 public class JpaMain {
 
@@ -17,52 +16,72 @@ public class JpaMain {
         tx.begin();
 
         try{
-            /*Member findMember = em.find(Member.class, 1L);
-            findMember.setName("HelloJPA");*/
-            /*List<Member> result = em.createQuery("select m from Member as m", Member.class)
-                    .setFirstResult(5)
-                    .setMaxResults(8)
-                    .getResultList();
-            for (Member member : result) {
-                System.out.println("member.name = " + member.getName());
-            }*/
+            Child child1 = new Child();
+            Child child2 = new Child();
 
-            /*Member member = new Member();
-            //member.setId("ID_A");
-            member.setUsername("C");
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
 
-            System.out.println("==================");
-            em.persist(member); //Identity전략에서는 em.persist한 순간에 commit이 됨
-            System.out.println("member.id = " + member.getId());
-            System.out.println("==================");*/
-
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
-
-            Member member = new Member();
-            member.setUsername("member1");
-            member.changeTeam(team);
-            em.persist(member);
+            em.persist(parent);
 
             em.flush();
             em.clear();
 
-            Team findTeam = em.find(Team.class, team.getId());
-            List<Member> members = findTeam.getMembers();
-            System.out.println("===================================");
-            for(Member m : members){
-                System.out.println("m = " + m.getUsername());
-            }
-            System.out.println("===================================");
+            Parent findParent = em.find(Parent.class, parent.getId());
+            findParent.getChildList().remove(0);
 
             tx.commit();
+/*
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member1 = new Member();
+            member1.setUsername("hello1");
+            member1.setTeam(team);
+//            Member member2 = new Member();
+//            member2.setUsername("hello12");
+            em.persist(member1);
+            //em.persist(member2);
+
+            em.flush();
+            em.clear();
+
+            Member m = em.find(Member.class, member1.getId());
+            System.out.println("m = " + m.getTeam().getClass());
+
+            //refMember.getUsername(); //강제 초기화
+//            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember)); //프록시 초기화 여부
+//            Hibernate.initialize(refMember); //강제 초기화
+
+//            Member m1 = em.find(Member.class, member1.getId());
+//            System.out.println("m1 = " + m1.getClass());
+//            Member reference = em.getReference(Member.class, member1.getId());
+//            System.out.println("reference = " + reference.getClass());
+//            Member m2 = em.getReference(Member.class, member2.getId());
+//
+//            //영속성 컨텍스트에 찾는 엔티티가 이미 있으면 em.getReference()를 호출해도 실제 엔티티 반환
+//            System.out.println("m1 == reference : " + (m1 == reference));
+//
+//            System.out.println("m1==m2 = " + (m1.getClass() == m2.getClass())); //m2는 프록시이기때문에 다름
+//            System.out.println("m1==m2 = " + (m1 instanceof Member)); //instanceof를 사용해야함
+//            System.out.println("m1==m2 = " + (m2 instanceof Member));
+
+            //Member findMember = em.find(Member.class, member.getId());
+//            Member findMember = em.getReference(Member.class, member.getId());
+//            System.out.println("findMember.id = " + findMember.getId());
+//            System.out.println("findMember.username = " + findMember.getUsername());
+//            System.out.println("findMember.username = " + findMember.getUsername());
+
+            tx.commit();
+*/
         } catch (Exception e){
             tx.rollback();
+            e.printStackTrace();
         } finally{
             em.close();
             emf.close();
         }
-
     }
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,14 +18,14 @@ public class Member {
     @Column(name = "USERNAME")
     private String username;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) //LAZY와 EAGER중에서 가급적 지연(LAZY)만 사용
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
-    @OneToOne
+    /*@OneToOne
     @JoinColumn(name = "LOCKER_ID")
     private Locker locker;
-
+*/
     /*private Integer age;
 
     @Enumerated(EnumType.STRING) //db에는 enum타입이 없기 때문에 enumerated를 사용해야 함, 그리고 STRING 필수
@@ -68,7 +68,7 @@ public class Member {
         return team;
     }
 
-    public void changeTeam(Team team) {
+    public void setTeam(Team team) {
         this.team = team;
         team.getMembers().add(this); //이걸 해줘야 1차캐시에서 값을 읽어올 수 있음
     }
