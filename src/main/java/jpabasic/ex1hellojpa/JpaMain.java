@@ -4,6 +4,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.List;
 
 public class JpaMain {
 
@@ -16,66 +20,54 @@ public class JpaMain {
         tx.begin();
 
         try{
-            Child child1 = new Child();
-            Child child2 = new Child();
+            Member member = new Member();
+            member.setUsername("member1");
+            em.persist(member);
 
-            Parent parent = new Parent();
-            parent.addChild(child1);
-            parent.addChild(child2);
 
-            em.persist(parent);
+
+            tx.commit();
+
+            /*Address address = new Address("city", "street", "zipcode");
+//
+//            Member member = new Member();
+//            member.setUsername("member1");
+//            member.setHomeAddress(address);
+//            em.persist(member);
+//
+            Address address1 = new Address("newCity", address.getStreet(), address.getZipcode());
+            Address address2 = new Address("newCity2", address.getStreet(), address.getZipcode());
+//            member.setHomeAddress(address1);
+
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setHomeAddress(address);
+
+            member.getFavoriteFoods().add("chicken");
+            member.getFavoriteFoods().add("pizza");
+            member.getFavoriteFoods().add("meat");
+
+            member.getAddressHistory().add(new AddressEntity(address1));
+            member.getAddressHistory().add(new AddressEntity(address2));
+
+            em.persist(member);
 
             em.flush();
             em.clear();
 
-            Parent findParent = em.find(Parent.class, parent.getId());
-            findParent.getChildList().remove(0);
+            System.out.println("====================================");
+            Member findMember = em.find(Member.class, member.getId());
 
-            tx.commit();
-/*
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            //city->oldcity setHomeAddress().setCity("newCity")이런식으로 하면 안됨. 다 갈아엎어야함
+            findMember.setHomeAddress(new Address("oldCity", address.getStreet(), address.getZipcode()));
+            findMember.getFavoriteFoods().remove("chicken");
+            findMember.getFavoriteFoods().add("rice");
 
-            Member member1 = new Member();
-            member1.setUsername("hello1");
-            member1.setTeam(team);
-//            Member member2 = new Member();
-//            member2.setUsername("hello12");
-            em.persist(member1);
-            //em.persist(member2);
+            //equals를 override해야함
+            findMember.getAddressHistory().remove(new AddressEntity("newCity", address.getStreet(), address.getZipcode()));
+            findMember.getAddressHistory().add(new AddressEntity("jeju", "wallstreet", "22222"));
 
-            em.flush();
-            em.clear();
-
-            Member m = em.find(Member.class, member1.getId());
-            System.out.println("m = " + m.getTeam().getClass());
-
-            //refMember.getUsername(); //강제 초기화
-//            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember)); //프록시 초기화 여부
-//            Hibernate.initialize(refMember); //강제 초기화
-
-//            Member m1 = em.find(Member.class, member1.getId());
-//            System.out.println("m1 = " + m1.getClass());
-//            Member reference = em.getReference(Member.class, member1.getId());
-//            System.out.println("reference = " + reference.getClass());
-//            Member m2 = em.getReference(Member.class, member2.getId());
-//
-//            //영속성 컨텍스트에 찾는 엔티티가 이미 있으면 em.getReference()를 호출해도 실제 엔티티 반환
-//            System.out.println("m1 == reference : " + (m1 == reference));
-//
-//            System.out.println("m1==m2 = " + (m1.getClass() == m2.getClass())); //m2는 프록시이기때문에 다름
-//            System.out.println("m1==m2 = " + (m1 instanceof Member)); //instanceof를 사용해야함
-//            System.out.println("m1==m2 = " + (m2 instanceof Member));
-
-            //Member findMember = em.find(Member.class, member.getId());
-//            Member findMember = em.getReference(Member.class, member.getId());
-//            System.out.println("findMember.id = " + findMember.getId());
-//            System.out.println("findMember.username = " + findMember.getUsername());
-//            System.out.println("findMember.username = " + findMember.getUsername());
-
-            tx.commit();
-*/
+            tx.commit();*/
         } catch (Exception e){
             tx.rollback();
             e.printStackTrace();

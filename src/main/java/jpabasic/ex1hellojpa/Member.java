@@ -1,14 +1,14 @@
 package jpabasic.ex1hellojpa;
 
-import org.hibernate.query.criteria.internal.ValueHandlerFactory;
-
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
-public class Member extends BaseEntity {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,33 +18,22 @@ public class Member extends BaseEntity {
     @Column(name = "USERNAME")
     private String username;
 
-    @ManyToOne(fetch = FetchType.LAZY) //LAZY와 EAGER중에서 가급적 지연(LAZY)만 사용
-    @JoinColumn(name = "TEAM_ID")
-    private Team team;
+    @Embedded
+    private Address homeAddress;
 
-    /*@OneToOne
-    @JoinColumn(name = "LOCKER_ID")
-    private Locker locker;
-*/
-    /*private Integer age;
+    @ElementCollection //collection들은 모두 지연로딩
+    @CollectionTable(name = "FAVORITE_FOOD", joinColumns = @JoinColumn(name = "MEMBER_ID"))
+    @Column(name = "FOOD_NAME")
+    private Set<String> favoriteFoods = new HashSet<>();
 
-    @Enumerated(EnumType.STRING) //db에는 enum타입이 없기 때문에 enumerated를 사용해야 함, 그리고 STRING 필수
-    private RoleType roleType;
+//    @ElementCollection
+//    @CollectionTable(name = "ADDRESS", joinColumns = @JoinColumn(name = "MEMBER_ID"))
+//    private List<Address> addressesHistory = new ArrayList<>();
 
-    @Temporal(TemporalType.TIMESTAMP) //db는 date, time, timestamp를 구분하기 때문에 이걸 사용해야함
-    private Date createdDate;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastModifiedDate;
-
-    private LocalDate testLocalDate; //Temporal은 요즘 잘 안씀..
-    private LocalDateTime testLocalDateTime;
-
-    @Lob //db에 varchar를 넘는 큰 값을 넣을때, 사용
-    private String description;
-
-    @Transient //db에 추가하고 싶지 않으면 Transient사용
-    private int temp;*/
 
     public Member(){}
 
@@ -64,21 +53,35 @@ public class Member extends BaseEntity {
         this.username = username;
     }
 
-    public Team getTeam() {
-        return team;
+    public Address getHomeAddress() {
+        return homeAddress;
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
-        team.getMembers().add(this); //이걸 해줘야 1차캐시에서 값을 읽어올 수 있음
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
-    @Override
-    public String toString() {
-        return "Member{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", team=" + team +
-                '}';
+    public Set<String> getFavoriteFoods() {
+        return favoriteFoods;
     }
+
+    public void setFavoriteFoods(Set<String> favoriteFoods) {
+        this.favoriteFoods = favoriteFoods;
+    }
+
+    public List<AddressEntity> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public void setAddressHistory(List<AddressEntity> addressHistory) {
+        this.addressHistory = addressHistory;
+    }
+
+    //    public List<Address> getAddressesHistory() {
+//        return addressesHistory;
+//    }
+//
+//    public void setAddressesHistory(List<Address> addressesHistory) {
+//        this.addressesHistory = addressesHistory;
+//    }
 }
